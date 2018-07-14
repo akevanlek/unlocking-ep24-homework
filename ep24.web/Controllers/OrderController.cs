@@ -26,14 +26,18 @@ namespace ep24.web.Controllers
         {
              //TODO: implement scenario ขอรายการสั่งซื้อที่ยืนยันรายการสั่งซื้อแล้ว
 
-            throw new NotImplementedException();
+            var order =  orderRepo.List(x=>x.PaidDate.HasValue);
+            return order;
         }
 
         [HttpPost]
         public OrderProductResponse OrderProduct([FromBody]OrderProductRequest request)
         {
             //TODO: implement scenario ไม่มีข้อมูล หรือไม่เลือกสินค้าที่จะสั่ง ให้แจ้งกลับว่า 'ไม่พบเมนูที่จะสั่ง' และไม่บันทึกข้อมูล   
-
+            if (request == null || request.OrderedProducts == null ||request.OrderedProducts.Count() <=0  )
+            {
+                return new OrderProductResponse { Message = "ไม่พบเมนูที่จะสั่ง", };
+            }
             var productIds = request.OrderedProducts.Select(p => p.Key);            
             var products = productRepo.GetAllProducts();
             var filteredProducts = products.Where(p => productIds.Contains(p.Id)).ToList();
